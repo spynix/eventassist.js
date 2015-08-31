@@ -45,11 +45,13 @@
  *     {
  *       label: "up",
  *       code: 38,
+ *       active: true,
  *       down: function() {},
  *       up: function() {}
  *     }, {
  *       label: "down",
  *       code: 40,
+ *       active: false,
  *       down: function() {},
  *       up: function() {}
  *     }
@@ -94,9 +96,11 @@ EventAssist.prototype.up = function(event) {
         
         /* do nothing */
       } else {
-        event.preventDefault();
-        this.pressing.splice(index, 1);
-        this.events[i].up();
+        if (this.events[i].active) {
+          event.preventDefault();
+          this.pressing.splice(index, 1);
+          this.events[i].up();
+        }
       }
     }
   }
@@ -117,9 +121,11 @@ EventAssist.prototype.down = function(event) {
         
         /* do nothing */
       } else {
-        event.preventDefault();
-        this.pressing.push(event.which);
-        this.events[i].down();
+        if (this.events[i].active) {
+          event.preventDefault();
+          this.pressing.push(event.which);
+          this.events[i].down();
+        }
       }
     }
   }
@@ -163,7 +169,7 @@ EventAssist.prototype.remove = function(labels) {
 
 
 /* press():
- *   manually trigger a key press via label
+ *   manually trigger a simulated key press via label
  */
 EventAssist.prototype.press = function(label, duration) {
   var i, l;
@@ -183,6 +189,40 @@ EventAssist.prototype.press = function(label, duration) {
     
     f();
   }(this.debug, this.events[i].label, this.events[i].up), ((duration && !isNaN(duration)) ? duration : 0));
+};
+
+
+/* activate():
+ *   activate one or multiple keys via an array of labels
+ */
+EventAssist.prototype.activate = function(labels) {
+  var i, j, k, l;
+  
+  for (i = 0, j = labels.length; i < j; i++) {
+    for (k = 0, l = this.events.length; k < l; k++) {
+      if (this.events[k].label == labels[i]) {
+        this.events[k].active = true;
+        break;
+      }
+    }
+  }
+};
+
+
+/* deactivate():
+ *   deactivate one or multiple keys via an array of labels
+ */
+EventAssist.prototype.deactivate = function(labels) {
+  var i, j, k, l;
+  
+  for (i = 0, j = labels.length; i < j; i++) {
+    for (k = 0, l = this.events.length; k < l; k++) {
+      if (this.events[k].label == labels[i]) {
+        this.events[k].active = false;
+        break;
+      }
+    }
+  }
 };
 
 
