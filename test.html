@@ -1,0 +1,50 @@
+<html>
+  <head>
+    <title>Event Assist - Test 1</title>
+    <style>
+
+    </style>
+    <script src="eventassist.js" type="text/javascript"></script>
+    <script>
+      (function() {
+        var controls = [
+          {
+            label: "up",
+            code: 38,
+            active: true,
+            down: function() {},
+            up: function() {}
+          }, {
+            label: "down",
+            code: 40,
+            active: true,
+            down: function() {},
+            up: function() {}
+          }, {
+            label: "left",
+            code: 37,
+            active: true,
+            down: function() {},
+            up: function() {}
+          }, {
+            label: "right",
+            code: 39,
+            active: true,
+            down: function() {},
+            up: function() {}
+          }, {
+            label: "space",
+            code: 32,
+            active: true,
+            down: function() {},
+            up: function() {}
+          }
+        ];
+        
+        window.ea = new EventAssist(controls, { debug: true });
+      })();
+    </script>
+  </head>
+  <body>
+  </body>
+</html>
