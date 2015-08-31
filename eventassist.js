@@ -104,7 +104,7 @@ EventAssist.prototype.up = function(event) {
       
       if ((index = this.pressing.indexOf(event.which)) == -1) { /* event wasn't already in a pressing state */
         if (this.debug)
-          console.log("  Warning: attempt to remove non-existant pressing state (label: " + this.events[i].label + "code: " + event.which.toString() + ")");
+          console.log("  Warning: attempt to remove non-existant pressing state (label: " + this.events[i].label + ", code: " + event.which.toString() + ")");
         
         /* do nothing */
       } else {
@@ -129,7 +129,7 @@ EventAssist.prototype.down = function(event) {
       
       if (this.pressing.indexOf(event.which) != -1) { /* event was already in a pressing state */
         if (this.debug)
-          console.log("  Warning: attempt to reassign pressing state (label: " + this.events[i].label + "code: " + event.which.toString() + ")");
+          console.log("  Warning: attempt to reassign pressing state (label: " + this.events[i].label + ", code: " + event.which.toString() + ")");
         
         /* do nothing */
       } else {
