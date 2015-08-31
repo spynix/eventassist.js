@@ -183,12 +183,14 @@ EventAssist.prototype.press = function(label, duration) {
   
   this.events[i].down();
   
-  setTimeout(function(debug, label, f) {
-    if (debug)
-      console.log("EventAssist->press(): simulated up (label: " + label + ")");
+  setTimeout((function(debug, label, f) {
+    return function() {
+      if (debug)
+        console.log("EventAssist->press(): simulated up (label: " + label + ")");
     
-    f();
-  }(this.debug, this.events[i].label, this.events[i].up), ((duration && !isNaN(duration)) ? duration : 0));
+      f();
+    };
+  })(this.debug, this.events[i].label, this.events[i].up), ((duration && !isNaN(duration)) ? duration : 0));
 };
 
 
