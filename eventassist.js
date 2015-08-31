@@ -77,9 +77,21 @@ function EventAssist(initial, options) {
   for (i = 0, l = initial.length; i < l; i++)
     this.events.push(initial[i]);
   
-  document.addEventListener("keydown", this.down, true);
-  document.addEventListener("keyup", this.up, true);  
+  document.addEventListener("keydown", this.down.bind(this), true);
+  document.addEventListener("keyup", this.up.bind(this), true);
 }
+
+
+EventAssist.prototype.listen = function() {
+  document.addEventListener("keydown", this.down.bind(this), true);
+  document.addEventListener("keyup", this.up.bind(this), true);
+};
+
+
+EventAssist.prototype.halt = function() {
+  document.removeEventListener("keydown", this.down.bind(this), true);
+  document.removeEventListener("keyup", this.up.bind(this), true);
+};
 
 
 EventAssist.prototype.up = function(event) {
