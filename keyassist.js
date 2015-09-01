@@ -1,4 +1,4 @@
-/*    File: eventassist.js
+/*    File: keyassist.js
  *  Author: Jin Savage ("spynix")
  *  
  *  
@@ -46,33 +46,45 @@
  *       label: "up",
  *       code: 38,
  *       active: true,
+ *       interval: 100,
  *       down: function() {},
+ *       during: null,
  *       up: function() {}
  *     }, {
  *       label: "down",
  *       code: 40,
  *       active: false,
+ *       interval: 500,
  *       down: function() {},
+ *       during: function() {},
  *       up: function() {}
  *     }
  *   ];
  * 
- * Currently the only config options is the debug setting, for console logging
- * keystrokes.  The example:
+ * Config options:
  * 
  *   config = {
- *     debug: true
+ *     debug: <boolean>,       - debug enables a bunch of console messages
+ *     interval: <number>      - interval sets the default polling speed for
+ *                               while pressed handlers.  this can be overridden
+ *                               in each entry to designate different polling
+ *                               speeds for different keys
  *   };
  */
 
 
-function EventAssist(initial, options) {
+function KeyAssist(initial, options) {
   var i, l;
   
   this.config = options;
+  
   this.debug = (this.config.debug ? true : false);
-  this.events = [];
-  this.pressing = [];
+  this.interval = (this.config.interval ? this.config.interval : 200);
+  
+  this.events = [];      /* collection of keys and their associated up, during, and down handlers */
+  this.pressing = [];    /* keys currently being pressed */
+  this.pressors = [];    /* keys that have been pressed and are currently running during handlers */
+  this.simulating = [];  /* a key that has been triggered not through direct user interaction */
   
   for (i = 0, l = initial.length; i < l; i++)
     this.events.push(initial[i]);
@@ -82,50 +94,37 @@ function EventAssist(initial, options) {
 }
 
 
-EventAssist.prototype.listen = function() {
+/* listen():
+ *   starts the assister listening for keys
+ */
+KeyAssist.prototype.listen = function() {
   document.addEventListener("keydown", this.down.bind(this), true);
   document.addEventListener("keyup", this.up.bind(this), true);
 };
 
 
-EventAssist.prototype.halt = function() {
+/* halt():
+ *   stops the assister listening for keys
+ */
+KeyAssist.prototype.halt = function() {
   document.removeEventListener("keydown", this.down.bind(this), true);
   document.removeEventListener("keyup", this.up.bind(this), true);
 };
 
 
-EventAssist.prototype.up = function(event) {
-  var i, l, index;
+/* down():
+ *   this takes care of when a key is pressed
+ */
+KeyAssist.prototype.down = function(event) {
+  var i, l, temp;
   
   for (i = 0, l = this.events.length; i < l; i++) {
     if (this.events[i].code == event.which) {
       if (this.debug)
-        console.log("EventAssist->up(" + this.events[i].label + ")");
+        console.log("KeyAssist->down(" + this.events[i].label + ")");
       
-      if ((index = this.pressing.indexOf(event.which)) == -1) { /* event wasn't already in a pressing state */
-        if (this.debug)
-          console.log("  Warning: attempt to remove non-existant pressing state (label: " + this.events[i].label + ", code: " + event.which.toString() + ")");
-        
-        /* do nothing */
-      } else {
-        if (this.events[i].active) {
-          event.preventDefault();
-          this.pressing.splice(index, 1);
-          this.events[i].up();
-        }
-      }
-    }
-  }
-};
-
-
-EventAssist.prototype.down = function(event) {
-  var i, l;
-  
-  for (i = 0, l = this.events.length; i < l; i++) {
-    if (this.events[i].code == event.which) {
-      if (this.debug)
-        console.log("EventAssist->down(" + this.events[i].label + ")");
+      if (this.simulating.indexOf(event.which) != -1) /* if its currently being simulated */
+        return 1;
       
       if (this.pressing.indexOf(event.which) != -1) { /* event was already in a pressing state */
         if (this.debug)
@@ -135,12 +134,65 @@ EventAssist.prototype.down = function(event) {
       } else {
         if (this.events[i].active) {
           event.preventDefault();
+          
           this.pressing.push(event.which);
           this.events[i].down();
+          
+          if (typeof this.events[i].during == "function") {
+            temp = setInterval(this.events[i].during, (this.events[i].interval ? this.events[i].interval : this.interval));
+            this.pressors.push({
+              code: this.events[i].code,
+              poller: temp
+            });
+          } 
         }
       }
     }
   }
+  
+  return 0;
+};
+
+
+/* up():
+ *   this handles everything when a key is released
+ */
+KeyAssist.prototype.up = function(event) {
+  var i, j, k, l, index, pressor;
+  
+  for (i = 0, j = this.events.length; i < j; i++) {
+    if (this.events[i].code == event.which) {
+      if (this.debug)
+        console.log("KeyAssist->up(" + this.events[i].label + ")");
+      
+      if (this.simulating.indexOf(event.which) != -1) /* if its currently being simulated */
+        return 1;
+      
+      if ((index = this.pressing.indexOf(event.which)) == -1) { /* event wasn't already in a pressing state */
+        if (this.debug)
+          console.log("  Warning: attempt to remove non-existant pressing state (label: " + this.events[i].label + ", code: " + event.which.toString() + ")");
+        
+        /* do nothing */
+      } else {
+        if (this.events[i].active) {
+          event.preventDefault();
+          
+          this.pressing.splice(index, 1);
+          
+          for (k = 0, l = this.pressors.length; k < l; k++)
+            if (this.pressors[k].code == event.which) {
+              clearInterval(this.pressors[k].poller);
+              this.pressors.splice(k, 1);
+              break;
+            }
+          
+          this.events[i].up();
+        }
+      }
+    }
+  }
+  
+  return 0;
 };
 
 
@@ -149,7 +201,7 @@ EventAssist.prototype.down = function(event) {
  *   
  *   additions are added against the key code
  */
-EventAssist.prototype.add = function(additions) {
+KeyAssist.prototype.add = function(additions) {
   var i, j, k, l;
   
   for (i = 0, j = additions.length; i < j; i++) {
@@ -166,7 +218,7 @@ EventAssist.prototype.add = function(additions) {
 /* remove():
  *   removes all events with the corresponding label
  */
-EventAssist.prototype.remove = function(labels) {
+KeyAssist.prototype.remove = function(labels) {
   var i, j, k, l;
   
   for (i = 0, j = labels.length; i < j; i++) {
@@ -183,33 +235,39 @@ EventAssist.prototype.remove = function(labels) {
 /* press():
  *   manually trigger a simulated key press via label
  */
-EventAssist.prototype.press = function(label, duration) {
+KeyAssist.prototype.press = function(label, duration) {
   var i, l;
   
   for (i = 0, l = this.events.length; i < l; i++)
     if (this.events[i].label == label)
       break;
   
+  this.simulating.push(this.events[i].code);
+  
   if (this.debug)
-    console.log("EventAssist->press(): simulated down (label: " + this.events[i].label + ")");
+    console.log("KeyAssist->press(): simulated down (label: " + this.events[i].label + ", code: " + this.events[i].code + ")");
   
   this.events[i].down();
   
-  setTimeout((function(debug, label, f) {
+  setTimeout((function(debug, label, code, f, p) {
     return function() {
       if (debug)
-        console.log("EventAssist->press(): simulated up (label: " + label + ")");
-    
+        console.log("KeyAssist->press(): simulated up (label: " + label + ", code: " + code + ")");
+      
+      /* execute the up function for the simulated key */
       f();
+      
+      /* remove the simulating state for that key so it can be pressed regularly again */
+      p.simulating.splice(p.simulating.indexOf(code), 1);
     };
-  })(this.debug, this.events[i].label, this.events[i].up), ((duration && !isNaN(duration)) ? duration : 0));
+  })(this.debug, this.events[i].label, this.events[i].code, this.events[i].up, this), ((duration && !isNaN(duration)) ? duration : 0));
 };
 
 
 /* activate():
  *   activate one or multiple keys via an array of labels
  */
-EventAssist.prototype.activate = function(labels) {
+KeyAssist.prototype.activate = function(labels) {
   var i, j, k, l;
   
   for (i = 0, j = labels.length; i < j; i++) {
@@ -226,7 +284,7 @@ EventAssist.prototype.activate = function(labels) {
 /* deactivate():
  *   deactivate one or multiple keys via an array of labels
  */
-EventAssist.prototype.deactivate = function(labels) {
+KeyAssist.prototype.deactivate = function(labels) {
   var i, j, k, l;
   
   for (i = 0, j = labels.length; i < j; i++) {
@@ -245,8 +303,41 @@ EventAssist.prototype.deactivate = function(labels) {
  *   
  *   currently only for the debug option
  */
-EventAssist.prototype.config = function(new_config) {
+KeyAssist.prototype.config = function(new_config) {
   this.config = new_config;
   
   this.debug = (this.config.debug ? true : false);
+  this.interval = (this.config.interval ? this.config.interval : 200);
+};
+
+
+/* set():
+ *   allows you to set the event handlers for a key without recreating the entry
+ *   
+ *   loc = label or code
+ */
+KeyAssist.prototype.set = function(loc, handler, f) {
+  var i, j, k, l;
+  var found = false;
+  
+  for (i = 0, j = this.events.length; i < k; i++)
+    if (typeof loc == "string") {
+      if (this.events[i].label == loc) {
+        found = true;
+        break;
+      }
+    } else if (typeof loc == "number") {
+      if (this.events[i].code == loc) {
+        found = true;
+        break;
+      }
+    } else {
+      /* shouldn't get here with valid input */
+    }
+    
+  if (!found)
+    return -1;
+    
+  if ((this.events[i])[handler] && (typeof f == "function"))
+    (this.events[i])[handler] = f;
 };
