@@ -317,10 +317,10 @@ KeyAssist.prototype.config = function(new_config) {
  *   loc = label or code
  */
 KeyAssist.prototype.set = function(loc, handler, f) {
-  var i, j, k, l;
+  var i, j;
   var found = false;
   
-  for (i = 0, j = this.events.length; i < k; i++)
+  for (i = 0, j = this.events.length; i < j; i++)
     if (typeof loc == "string") {
       if (this.events[i].label == loc) {
         found = true;
