@@ -270,9 +270,18 @@ KeyAssist.prototype.press = function(label, duration) {
 KeyAssist.prototype.activate = function(labels) {
   var i, j, k, l;
   
-  for (i = 0, j = labels.length; i < j; i++) {
+  if (typeof labels == "object") {
+    for (i = 0, j = labels.length; i < j; i++) {
+      for (k = 0, l = this.events.length; k < l; k++) {
+        if (this.events[k].label == labels[i]) {
+          this.events[k].active = true;
+          break;
+        }
+      }
+    }
+  } else {
     for (k = 0, l = this.events.length; k < l; k++) {
-      if (this.events[k].label == labels[i]) {
+      if (this.events[k].label == labels) {
         this.events[k].active = true;
         break;
       }
@@ -287,14 +296,39 @@ KeyAssist.prototype.activate = function(labels) {
 KeyAssist.prototype.deactivate = function(labels) {
   var i, j, k, l;
   
-  for (i = 0, j = labels.length; i < j; i++) {
+  if (typeof labels == "object") {
+    for (i = 0, j = labels.length; i < j; i++) {
+      for (k = 0, l = this.events.length; k < l; k++) {
+        if (this.events[k].label == labels[i]) {
+          this.events[k].active = false;
+          break;
+        }
+      }
+    }
+  } else {
     for (k = 0, l = this.events.length; k < l; k++) {
-      if (this.events[k].label == labels[i]) {
+      if (this.events[k].label == labels) {
         this.events[k].active = false;
         break;
       }
     }
   }
+};
+
+
+/* enable():
+ *   alias for activate()
+ */
+KeyAssist.prototype.enable = function(labels) {
+  this.activate(labels);
+};
+
+
+/* disable():
+ *   alias for deactivate()
+ */
+KeyAssist.prototype.disable = function(labels) {
+  this.deactivate(labels);
 };
 
 
