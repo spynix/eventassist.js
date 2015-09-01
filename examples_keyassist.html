@@ -194,10 +194,14 @@
     </div>
     <div class="buttons">
       <button id="clear">Clear</button>
+      <button id="set1">Original Right During Handler</button>
+      <button id="set2">Different Right During Handler</button>
     </div>
     <script type="text/javascript">
       (function() {
         var clear = document.getElementById("clear");
+        var set1 = document.getElementById("set1");
+        var set2 = document.getElementById("set2");
         
         clear.onclick = function() {
           var up = document.getElementById("up");
@@ -220,6 +224,26 @@
           
           while (space.lastChild)
             space.removeChild(space.lastChild);
+        };
+        
+        
+        set1.onclick = function() {
+          window.ka.set("right", "during", function() {
+            var node = document.getElementById("right");
+              
+            node.appendChild(document.createTextNode("You're holding right."));
+            node.appendChild(document.createElement("br"));
+          });
+        };
+        
+        
+        set2.onclick = function() {
+          window.ka.set("right", "during", function() {
+            var node = document.getElementById("right");
+              
+            node.appendChild(document.createTextNode("This is a different handler."));
+            node.appendChild(document.createElement("br"));
+          });
         };
       })();
     </script>
