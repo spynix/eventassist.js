@@ -2,7 +2,12 @@
   <head>
     <title>Key Assist - Test 1</title>
     <style>
+      body {
+        background-color: #a0a0a0;
+      }
+      
       .container {
+        font-family: Tahoma, sans-serif;
         width: 900px;
         margin-left: auto;
         margin-right: auto;
@@ -22,14 +27,25 @@
         width: 250px;
         margin: 0 4px;
         overflow: auto;
+        background-color: #f0f0f0;
+      }
+      
+      .container .row .info {
+        text-align: left;
+        border: 1px solid #000000;
+        padding: 8px;
+        width: 884px;
+        background-color: #f0f0f0;
       }
       
       .buttons {
+        text-align: center;
+        width: 900px;
         margin-left: auto;
         margin-right: auto;
       }
     </style>
-    <script src="jquery-2.1.4.min.js" type="text/javascript"></script>
+    <!--<script src="jquery-2.1.4.min.js" type="text/javascript"></script>-->
     <script src="keyassist.js" type="text/javascript"></script>
     <script>
       (function() {
@@ -207,5 +223,38 @@
         };
       })();
     </script>
+    <div class="container">
+      <div class="row">
+        <div class="info">
+          KeyAssist is a utility class designed to help make the drama of
+          managing key events more manageable in the realm of web gaming.<br />
+          <br />
+          This particular example demonstrates KeyAssist's basic functionality.
+          Press and release the arrow keys and space bar and see.  Don't forget
+          to hold them down, too!<br />
+          <br />
+          It's important to handle your controls carefully -- but how about
+          using something that does it for you?  Then the developer can focus on
+          what the keys actually do, rather than managing them.<br />
+          <br />
+          Of particular note is the "during" handler.  On your computer, it will
+          usually generate keystrokes continuously if you have a key held down.
+          This is great for typing, but in a game it's something a developer
+          will normally have to manhandle or trash altogether.  What we're
+          usually interested in isn't a bunch of repeated events, but a single
+          down event, if you're holding the key down, and when you let it go.<br />
+          <br />
+          For example most games involve some sort of walking around, right?
+          What if you had to press forward over and over to go forward?  Or what
+          if you had to lower your keyboard's repeat rate so you didn't walk
+          forward so insanely fast?<br />
+          <br />
+          KeyAssist can help with this by generating a single key event for each
+          down and up of a key.  While the key is held down, it will run a
+          "during" handler at whatever rate the developer wants.  This can make
+          things like handling movement much simpler.
+        </div>
+      </div>
+    </div>
   </body>
 </html>
