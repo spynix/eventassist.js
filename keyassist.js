@@ -123,6 +123,8 @@ KeyAssist.prototype.down = function(event) {
       if (this.debug)
         console.log("KeyAssist->down(" + this.events[i].label + ")");
       
+      event.preventDefault();
+      
       if (this.simulating.indexOf(event.which) != -1) /* if its currently being simulated */
         return 1;
       
@@ -133,8 +135,6 @@ KeyAssist.prototype.down = function(event) {
         /* do nothing */
       } else {
         if (this.events[i].active) {
-          event.preventDefault();
-          
           this.pressing.push(event.which);
           this.events[i].down();
           
@@ -165,6 +165,8 @@ KeyAssist.prototype.up = function(event) {
       if (this.debug)
         console.log("KeyAssist->up(" + this.events[i].label + ")");
       
+      event.preventDefault();
+      
       if (this.simulating.indexOf(event.which) != -1) /* if its currently being simulated */
         return 1;
       
@@ -175,8 +177,6 @@ KeyAssist.prototype.up = function(event) {
         /* do nothing */
       } else {
         if (this.events[i].active) {
-          event.preventDefault();
-          
           this.pressing.splice(index, 1);
           
           for (k = 0, l = this.pressors.length; k < l; k++)
