@@ -1,10 +1,36 @@
 <html>
   <head>
-    <title>Event Assist - Test 1</title>
+    <title>Key Assist - Test 1</title>
     <style>
-
+      .container {
+        width: 900px;
+        margin-left: auto;
+        margin-right: auto;
+      }
+      
+      .container .row {
+        width: 900px;
+        text-align: center;
+        margin: 14px 0;
+      }
+      
+      .container .row .data {
+        text-align: left;
+        display: inline-block;
+        border: 1px solid #000000;
+        height: 200px;
+        width: 250px;
+        margin: 0 4px;
+        overflow: auto;
+      }
+      
+      .buttons {
+        margin-left: auto;
+        margin-right: auto;
+      }
     </style>
-    <script src="eventassist.js" type="text/javascript"></script>
+    <script src="jquery-2.1.4.min.js" type="text/javascript"></script>
+    <script src="keyassist.js" type="text/javascript"></script>
     <script>
       (function() {
         var controls = [
@@ -12,39 +38,174 @@
             label: "up",
             code: 38,
             active: true,
-            down: function() {},
-            up: function() {}
+            down: function() {
+              var node = document.getElementById("up");
+              
+              node.appendChild(document.createTextNode("+ You pressed up."));
+              node.appendChild(document.createElement("br"));
+            },
+            during: function() {
+              var node = document.getElementById("up");
+              
+              node.appendChild(document.createTextNode("You're holding up.\r\n"));
+              node.appendChild(document.createElement("br"));
+            },
+            up: function() {
+              var node = document.getElementById("up");
+              
+              node.appendChild(document.createTextNode("- You released up.\r\n"));
+              node.appendChild(document.createElement("br"));
+            }
           }, {
             label: "down",
             code: 40,
             active: true,
-            down: function() {},
-            up: function() {}
+            down: function() {
+              var node = document.getElementById("down");
+              
+              node.appendChild(document.createTextNode("+ You pressed down."));
+              node.appendChild(document.createElement("br"));
+            },
+            during: function() {
+              var node = document.getElementById("down");
+              
+              node.appendChild(document.createTextNode("You're holding down."));
+              node.appendChild(document.createElement("br"));
+            },
+            up: function() {
+              var node = document.getElementById("down");
+              
+              node.appendChild(document.createTextNode("- You released down."));
+              node.appendChild(document.createElement("br"));
+            }
           }, {
             label: "left",
             code: 37,
             active: true,
-            down: function() {},
-            up: function() {}
+            down: function() {
+              var node = document.getElementById("left");
+              
+              node.appendChild(document.createTextNode("+ You pressed left."));
+              node.appendChild(document.createElement("br"));
+            },
+            during: function() {
+              var node = document.getElementById("left");
+              
+              node.appendChild(document.createTextNode("You're holding left."));
+              node.appendChild(document.createElement("br"));
+            },
+            up: function() {
+              var node = document.getElementById("left");
+              
+              node.appendChild(document.createTextNode("- You released left."));
+              node.appendChild(document.createElement("br"));
+            }
           }, {
             label: "right",
             code: 39,
             active: true,
-            down: function() {},
-            up: function() {}
+            down: function() {
+              var node = document.getElementById("right");
+              
+              node.appendChild(document.createTextNode("+ You pressed right."));
+              node.appendChild(document.createElement("br"));
+            },
+            during: function() {
+              var node = document.getElementById("right");
+              
+              node.appendChild(document.createTextNode("You're holding right."));
+              node.appendChild(document.createElement("br"));
+            },
+            up: function() {
+              var node = document.getElementById("right");
+              
+              node.appendChild(document.createTextNode("- You released right."));
+              node.appendChild(document.createElement("br"));
+            }
           }, {
             label: "space",
             code: 32,
             active: true,
-            down: function() {},
-            up: function() {}
+            interval: 500,
+            down: function() {
+              var node = document.getElementById("space");
+              
+              node.appendChild(document.createTextNode("+ You pressed space."));
+              node.appendChild(document.createElement("br"));
+            },
+            during: function() {
+              var node = document.getElementById("space");
+              
+              node.appendChild(document.createTextNode("You're holding space.  This is slower thanks to the interval setting."));
+              node.appendChild(document.createElement("br"));
+            },
+            up: function() {
+              var node = document.getElementById("space");
+              
+              node.appendChild(document.createTextNode("- You released space."));
+              node.appendChild(document.createElement("br"));
+            }
           }
         ];
         
-        window.ea = new EventAssist(controls, { debug: true });
+        window.ka = new KeyAssist(controls, { debug: true });
       })();
     </script>
   </head>
   <body>
+    <div class="container">
+      <div class="row">
+        <div id="up" class="data">
+          
+        </div>
+      </div>
+      <div class="row">
+        <div id="left" class="data">
+          
+        </div>
+        <div id="space" class="data">
+          
+        </div>
+        <div id="right" class="data">
+          
+        </div>
+      </div>
+      <div class="row">
+        <div id="down" class="data">
+          
+        </div>
+      </div>
+    </div>
+    <div class="buttons">
+      <button id="clear">Clear</button>
+    </div>
+    <script type="text/javascript">
+      (function() {
+        var clear = document.getElementById("clear");
+        
+        clear.onclick = function() {
+          var up = document.getElementById("up");
+          var down = document.getElementById("down");
+          var left = document.getElementById("left");
+          var right = document.getElementById("right");
+          var space = document.getElementById("space");
+          
+          while (up.lastChild)
+            up.removeChild(up.lastChild);
+          
+          while (down.lastChild)
+            down.removeChild(down.lastChild);
+          
+          while (left.lastChild)
+            left.removeChild(left.lastChild);
+          
+          while (right.lastChild)
+            right.removeChild(right.lastChild);
+          
+          while (space.lastChild)
+            space.removeChild(space.lastChild);
+        };
+      })();
+    </script>
   </body>
 </html>
