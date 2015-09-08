@@ -322,17 +322,13 @@ KeyAssist.prototype.deactivate = function(labels) {
 /* enable():
  *   alias for activate()
  */
-KeyAssist.prototype.enable = function(labels) {
-  this.activate(labels);
-};
+KeyAssist.prototype.enable = KeyAssist.prototype.activate;
 
 
 /* disable():
  *   alias for deactivate()
  */
-KeyAssist.prototype.disable = function(labels) {
-  this.deactivate(labels);
-};
+KeyAssist.prototype.disable = KeyAssist.prototype.deactivate;
 
 
 /* config():
