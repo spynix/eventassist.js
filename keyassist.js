@@ -251,6 +251,8 @@ KeyAssist.prototype.press = function(label, duration) {
   
   setTimeout((function(debug, label, code, f, p) {
     return function() {
+      var index;
+      
       if (debug)
         console.log("KeyAssist->press(): simulated up (label: " + label + ", code: " + code + ")");
       
@@ -258,7 +260,8 @@ KeyAssist.prototype.press = function(label, duration) {
       f();
       
       /* remove the simulating state for that key so it can be pressed regularly again */
-      p.simulating.splice(p.simulating.indexOf(code), 1);
+      if ((index = p.simulating.indexOf(code)) != -1)
+        p.simulating.splice(index, 1);
     };
   })(this.debug, this.events[i].label, this.events[i].code, this.events[i].up, this), ((duration && !isNaN(duration)) ? duration : 0));
 };
@@ -349,6 +352,8 @@ KeyAssist.prototype.config = function(new_config) {
  *   allows you to set the event handlers for a key without recreating the entry
  *   
  *   loc = label or code
+ *   handler = up, down, during (type <string>)
+ *   f = new function to assign to <loc> specified <handler>
  */
 KeyAssist.prototype.set = function(loc, handler, f) {
   var i, j;
