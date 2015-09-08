@@ -5,7 +5,9 @@ the only class written is KeyAssist.
 
 
 ### KeyAssist:
-KeyAssist is a class that helps to manage key events for web gaming.
+KeyAssist is a class that helps to manage key events for web gaming.  Yes I'm
+aware the documentation is lacking.  That will be remedied sometime in the near
+future.
 
 ##### API:
 - new KeyAssist(initial, options)  
